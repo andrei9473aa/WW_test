@@ -5,14 +5,33 @@
 {% block content %}
     <h1>Manage Application</h1>
 
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
+    {{ form_start(applicationForm) }}
+        {{ form_widget(applicationForm) }}
 
         <button class="btn btn-primary mb-5">Choose status</button>
-    {{ form_end(form) }}
+    {{ form_end(applicationForm) }}
 
-    <h3>Comments</h3>
+    <h3 class="mb-4">Comments</h3>
 
-    
+    {{ form_start(commentForm, { action: path('application_comment', { id: application.id }) }) }}
+        {{ form_widget(commentForm) }}
+
+        <button class="btn btn-primary">Comment</button>
+    {{ form_end(commentForm) }}
+
+
+    {% for comment in application.comments %}
+
+        <table class="table mt-5">
+            <tbody>
+            <tr>
+                <td>{{ comment.author.email }}</td>
+                <td>{{ comment.text }}</td>
+            </tr>
+            </tbody>
+        </table>
+
+    {% endfor %}
+
 
 {% endblock %}

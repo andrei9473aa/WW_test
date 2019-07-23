@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Application;
+use App\Entity\Comment;
 use App\Form\ApplicationManageType;
 use App\Form\ApplicationType;
+use App\Form\CommentType;
 use App\Repository\ApplicationRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,6 +25,12 @@ class ApplicationController extends AbstractController
      */
     public function index(ApplicationRepository $applicationRepository): Response
     {
+        if($this->isGranted('ROLE_MANAGER')) {
+            return $this->render('application/index.html.twig', [
+                'applications' => $applicationRepository->findBy(['manager' => $this->getUser()]),
+            ]);
+        }
+
         return $this->render('application/index.html.twig', [
             'applications' => $applicationRepository->findAll(),
         ]);
@@ -32,12 +40,14 @@ class ApplicationController extends AbstractController
      * @Route("/{id}/manage", name="application_manage", methods={"GET","POST"})
      * @IsGranted("MANAGE", subject="application")
      */
-    public function changeStatus(Request $request, Application $application) {
+    public function manage(Request $request, Application $application) {
 
-        $form = $this->createForm(ApplicationManageType::class, $application);
-        $form->handleRequest($request);
+        $applicationForm = $this->createForm(ApplicationManageType::class, $application);
+        $applicationForm->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        $commentForm = $this->createForm(CommentType::class);
+
+        if ($applicationForm->isSubmitted() && $applicationForm->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('application_manage', [
@@ -47,7 +57,8 @@ class ApplicationController extends AbstractController
 
         return $this->render('application/manage.html.twig', [
             'application' => $application,
-            'form' => $form->createView(),
+            'applicationForm' => $applicationForm->createView(),
+            'commentForm' => $commentForm->createView(),
         ]);
 
     }
@@ -121,5 +132,30 @@ class ApplicationController extends AbstractController
         }
 
         return $this->redirectToRoute('application_index');
+    }
+
+    /**
+     * @Route("/{id}/comment/new", name="application_comment", methods={"POST"})
+     * @IsGranted("MANAGE", subject="application")
+     */
+    public function commentApplication(Request $request, Application $application): Response
+    {
+        $comment = new Comment();
+        $form = $this->createForm(CommentType::class, $comment);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $comment->setApplication($application);
+            $comment->setAuthor($this->getUser());
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($comment);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('application_manage', [
+                'id' => $application->getId(),
+            ]);
+        }
     }
 }
