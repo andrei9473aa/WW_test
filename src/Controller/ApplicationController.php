@@ -26,16 +26,28 @@ class ApplicationController extends AbstractController
      * @Route("/", name="application_index", methods={"GET"})
      * @IsGranted({"ROLE_MODERATOR", "ROLE_MANAGER"})
      */
-    public function index(ApplicationRepository $applicationRepository): Response
+    public function index(Request $request, ApplicationRepository $applicationRepository): Response
     {
         if($this->isGranted('ROLE_MANAGER')) {
+
             return $this->render('application/index.html.twig', [
                 'applications' => $applicationRepository->findBy(['manager' => $this->getUser()]),
             ]);
         }
 
+        switch ($request->query->get('managed')) {
+            case 'true':
+                $applications = $applicationRepository->findManaged();
+                break;
+            case 'false':
+                $applications = $applicationRepository->findWithNoManager();
+                break;
+            default:
+                $applications = $applicationRepository->findAll();
+        }
+
         return $this->render('application/index.html.twig', [
-            'applications' => $applicationRepository->findAll(),
+            'applications' => $applications,
         ]);
     }
 
