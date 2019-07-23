@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Application;
 use App\Form\ApplicationType;
 use App\Repository\ApplicationRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +18,7 @@ class ApplicationController extends AbstractController
 {
     /**
      * @Route("/", name="application_index", methods={"GET"})
+     * @IsGranted({"ROLE_MODERATOR", "ROLE_MANAGER"})
      */
     public function index(ApplicationRepository $applicationRepository): Response
     {
@@ -27,6 +29,7 @@ class ApplicationController extends AbstractController
 
     /**
      * @Route("/new", name="application_new", methods={"GET","POST"})
+     * @IsGranted("ROLE_USER")
      */
     public function new(Request $request): Response
     {
@@ -50,6 +53,7 @@ class ApplicationController extends AbstractController
 
     /**
      * @Route("/{id}", name="application_show", methods={"GET"})
+     * @IsGranted("WATCH", subject="application")
      */
     public function show(Application $application): Response
     {
@@ -60,6 +64,7 @@ class ApplicationController extends AbstractController
 
     /**
      * @Route("/{id}/edit", name="application_edit", methods={"GET","POST"})
+     * @IsGranted("EDIT", subject="application")
      */
     public function edit(Request $request, Application $application): Response
     {
@@ -80,6 +85,7 @@ class ApplicationController extends AbstractController
 
     /**
      * @Route("/{id}", name="application_delete", methods={"DELETE"})
+     * @IsGranted("DELETE", subject="application")
      */
     public function delete(Request $request, Application $application): Response
     {
