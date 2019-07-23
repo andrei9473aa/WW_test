@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ApplicationRepository")
@@ -30,11 +31,13 @@ class Application
 
     /**
      * @ORM\Column(type="datetime")
+     * @Gedmo\Timestampable(on="create")
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Gedmo\Timestampable(on="update")
      */
     private $updatedAt;
 
@@ -56,7 +59,6 @@ class Application
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\ApplicationStatus", inversedBy="application")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $status;
 
@@ -175,6 +177,13 @@ class Application
 
     public function getStatus(): ?ApplicationStatus
     {
+        if($this->status === null) {
+            $status = new ApplicationStatus();
+            $status->setName('new');
+
+            return $status;
+        }
+
         return $this->status;
     }
 

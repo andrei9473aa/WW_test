@@ -78,6 +78,9 @@ class ApplicationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $application->setAuthor($this->getUser());
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($application);
             $entityManager->flush();
