@@ -27,6 +27,14 @@
                 <th>UpdatedAt</th>
                 <td>{{ application.updatedAt ? application.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
+            <tr>
+                <th>Manager</th>
+                <td>{{ application.manager.email is defined ? application.manager.email : 'not assigned' }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ application.status.name }}</td>
+            </tr>
         </tbody>
     </table>
 
