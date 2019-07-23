@@ -26,7 +26,7 @@
                 <td>{{ application.updatedAt ? application.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
                     <a href="{{ path('application_show', {'id': application.id}) }}">show</a>
-                    <a href="{{ path('application_edit', {'id': application.id}) }}">edit</a>
+                    <a href="{{ path('application_set_manager', {'id': application.id}) }}">manager</a>
                 </td>
             </tr>
         {% else %}

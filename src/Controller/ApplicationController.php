@@ -7,6 +7,7 @@ use App\Entity\Comment;
 use App\Form\ApplicationManageType;
 use App\Form\ApplicationType;
 use App\Form\CommentType;
+use App\Form\SetApplicationManagerType;
 use App\Repository\ApplicationRepository;
 use App\Repository\CommentRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -164,5 +165,30 @@ class ApplicationController extends AbstractController
                 'id' => $application->getId(),
             ]);
         }
+    }
+
+    /**
+     * @Route("/{id}/set-manager", name="application_set_manager", methods={"GET","POST"})
+     * @IsGranted("ROLE_MODERATOR")
+     */
+    public function setManager(Request $request, Application $application) {
+
+        $form = $this->createForm(SetApplicationManagerType::class, $application);
+        $form->handleRequest($request);
+
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->getDoctrine()->getManager()->flush();
+
+            return $this->redirectToRoute('application_set_manager', [
+                'id' => $application->getId(),
+            ]);
+        }
+
+        return $this->render('application/set_manager.html.twig', [
+            'application' => $application,
+            'form' => $form->createView(),
+        ]);
+
     }
 }

@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Set manager{% endblock %}
+
+{% block content %}
+    <h1>Set manager</h1>
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+
+        <button class="btn btn-primary mb-5">Set manager</button>
+    {{ form_end(form) }}
+
+
+{% endblock %}
