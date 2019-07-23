@@ -11,6 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ApplicationManageType extends AbstractType
 {
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -19,7 +20,7 @@ class ApplicationManageType extends AbstractType
                 'choice_label' => function(ApplicationStatus $status) {
                     return $status->getName();
                 },
-                'placeholder' => 'Choose status!'
+                'placeholder' => 'Choose status!',
             ])
         ;
     }

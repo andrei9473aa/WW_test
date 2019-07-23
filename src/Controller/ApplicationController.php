@@ -9,6 +9,7 @@ use App\Form\ApplicationType;
 use App\Form\CommentType;
 use App\Form\SetApplicationManagerType;
 use App\Repository\ApplicationRepository;
+use App\Repository\ApplicationStatusRepository;
 use App\Repository\CommentRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -49,7 +50,7 @@ class ApplicationController extends AbstractController
 
         $commentForm = $this->createForm(CommentType::class);
 
-        $comments = $commentRepository->findWithAuthor($this->getUser());
+        $comments = $commentRepository->findWithAuthorAndApplication($this->getUser(), $application);
 
         if ($applicationForm->isSubmitted() && $applicationForm->isValid()) {
             $this->getDoctrine()->getManager()->flush();
@@ -72,7 +73,7 @@ class ApplicationController extends AbstractController
      * @Route("/new", name="application_new", methods={"GET","POST"})
      * @IsGranted("ROLE_USER")
      */
-    public function new(Request $request): Response
+    public function new(Request $request, ApplicationStatusRepository $applicationStatusRepository): Response
     {
         $application = new Application();
         $form = $this->createForm(ApplicationType::class, $application);
@@ -80,7 +81,10 @@ class ApplicationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $status = $applicationStatusRepository->findOneBy(['name' => 'new']);
+
             $application->setAuthor($this->getUser());
+            $application->setStatus($status);
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($application);
@@ -99,10 +103,13 @@ class ApplicationController extends AbstractController
      * @Route("/{id}", name="application_show", methods={"GET"})
      * @IsGranted("WATCH", subject="application")
      */
-    public function show(Application $application): Response
+    public function show(Application $application, CommentRepository $commentRepository): Response
     {
+        $comments = $commentRepository->findBy(['application' => $application]);
+
         return $this->render('application/show.html.twig', [
             'application' => $application,
+            'comments' => $comments,
         ]);
     }
 

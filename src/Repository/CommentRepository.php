@@ -19,16 +19,19 @@ class CommentRepository extends ServiceEntityRepository
         parent::__construct($registry, Comment::class);
     }
 
-    public function findWithAuthor($author)
+    public function findWithAuthorAndApplication($author, $application)
     {
         return $this->createQueryBuilder('c')
             ->innerJoin('c.author', 'a')
             ->andWhere('a = :author')
             ->setParameter('author', $author)
+            ->innerJoin('c.application', 'app')
+            ->andWhere('app = :app')
+            ->setParameter('app', $application)
             ->orderBy('c.id', 'ASC')
             ->addSelect('a')
             ->getQuery()
-            ->getResult()
+            ->execute()
         ;
     }
 

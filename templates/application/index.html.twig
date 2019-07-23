@@ -26,7 +26,13 @@
                 <td>{{ application.updatedAt ? application.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
                     <a href="{{ path('application_show', {'id': application.id}) }}">show</a>
-                    <a href="{{ path('application_set_manager', {'id': application.id}) }}">manager</a>
+                    {% if is_granted('ROLE_MODERATOR') %}
+                        <a href="{{ path('application_set_manager', {'id': application.id}) }}">manager</a>
+                    {% endif %}
+                    
+                    {% if is_granted('MANAGE', application) %}
+                        <a href="{{ path('application_manage', { id: application.id }) }}">manage</a>
+                    {% endif %}
                 </td>
             </tr>
         {% else %}
