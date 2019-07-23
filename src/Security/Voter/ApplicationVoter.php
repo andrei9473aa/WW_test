@@ -37,7 +37,10 @@ class ApplicationVoter extends Voter
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
             case 'WATCH':
-                if($this->security->isGranted(['ROLE_MODERATOR', 'ROLE_MANAGER'])){
+                if($this->security->isGranted('ROLE_MODERATOR')){
+                    return true;
+                }
+                if($subject->getManager() == $user) {
                     return true;
                 }
                 if($subject->getAuthor() == $user) {
@@ -58,7 +61,6 @@ class ApplicationVoter extends Voter
                 if($subject->getManager() == $user) {
                     return true;
                 }
-                break;
         }
 
         return false;
