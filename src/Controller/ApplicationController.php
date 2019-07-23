@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Application;
+use App\Form\ApplicationManageType;
 use App\Form\ApplicationType;
 use App\Repository\ApplicationRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -25,6 +26,30 @@ class ApplicationController extends AbstractController
         return $this->render('application/index.html.twig', [
             'applications' => $applicationRepository->findAll(),
         ]);
+    }
+
+    /**
+     * @Route("/{id}/manage", name="application_manage", methods={"GET","POST"})
+     * @IsGranted("MANAGE", subject="application")
+     */
+    public function changeStatus(Request $request, Application $application) {
+
+        $form = $this->createForm(ApplicationManageType::class, $application);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->getDoctrine()->getManager()->flush();
+
+            return $this->redirectToRoute('application_manage', [
+                'id' => $application->getId(),
+            ]);
+        }
+
+        return $this->render('application/manage.html.twig', [
+            'application' => $application,
+            'form' => $form->createView(),
+        ]);
+
     }
 
     /**

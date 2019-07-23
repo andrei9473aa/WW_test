@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manage Application{% endblock %}
+
+{% block content %}
+    <h1>Manage Application</h1>
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+
+        <button class="btn btn-primary mb-5">Choose status</button>
+    {{ form_end(form) }}
+
+    <h3>Comments</h3>
+
+    
+
+{% endblock %}
