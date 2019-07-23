@@ -8,6 +8,7 @@ use App\Form\ApplicationManageType;
 use App\Form\ApplicationType;
 use App\Form\CommentType;
 use App\Repository\ApplicationRepository;
+use App\Repository\CommentRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,12 +41,14 @@ class ApplicationController extends AbstractController
      * @Route("/{id}/manage", name="application_manage", methods={"GET","POST"})
      * @IsGranted("MANAGE", subject="application")
      */
-    public function manage(Request $request, Application $application) {
+    public function manage(Request $request, Application $application, CommentRepository $commentRepository) {
 
         $applicationForm = $this->createForm(ApplicationManageType::class, $application);
         $applicationForm->handleRequest($request);
 
         $commentForm = $this->createForm(CommentType::class);
+
+        $comments = $commentRepository->findWithAuthor($this->getUser());
 
         if ($applicationForm->isSubmitted() && $applicationForm->isValid()) {
             $this->getDoctrine()->getManager()->flush();
@@ -59,6 +62,7 @@ class ApplicationController extends AbstractController
             'application' => $application,
             'applicationForm' => $applicationForm->createView(),
             'commentForm' => $commentForm->createView(),
+            'comments' => $comments,
         ]);
 
     }
